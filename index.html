@@ -111,7 +111,7 @@ a{color:var(--accent-cyan);}
    ============================================================ */
 .stage{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 440px;
+  grid-template-columns:minmax(320px, 560px) minmax(460px, 1fr);
   gap:26px;
   margin-top:26px;
   align-items:start;
@@ -1234,7 +1234,7 @@ const MSK_DATA = [
   // ---------------- LEFT COLUMN ----------------
   {
     id:'shoulder_msk', code:'SHD', name:'Shoulder', region:'MSK · Upper extremity (bilateral)', side:'left',
-    x:116, y:122,
+    x:138, y:122,
     sections:[
                   {title:'Reference Images', source:'RaD-Pic Device Picture Dictionary', type:'gallery', gallery:'shoulder_msk'},
       {title:'Arthroplasty Types', source:'RaD-Pic Device Picture Dictionary', type:'table',
@@ -1258,7 +1258,7 @@ const MSK_DATA = [
   },
   {
     id:'forearm_hand_msk', code:'FAH', name:'Forearm, Wrist & Hand', region:'MSK · Upper extremity (bilateral)', side:'left',
-    x:116, y:305,
+    x:138, y:305,
     sections:[
                   {title:'Reference Images', source:'RaD-Pic Device Picture Dictionary', type:'gallery', gallery:'forearm_hand_msk'},
       {title:'DRUJ Arthroplasty', source:'RaD-Pic Device Picture Dictionary', type:'list', items:[
@@ -1348,7 +1348,7 @@ const MSK_DATA = [
   // ---------------- RIGHT COLUMN ----------------
   {
     id:'elbow_msk', code:'ELB', name:'Elbow', region:'MSK · Upper extremity (bilateral)', side:'right',
-    x:284, y:214,
+    x:262, y:214,
     sections:[
                   {title:'Reference Images', source:'RaD-Pic Device Picture Dictionary', type:'gallery', gallery:'elbow_msk'},
       {title:'Arthroplasty & Fixation', source:'RaD-Pic Device Picture Dictionary', type:'table',
@@ -2341,8 +2341,8 @@ function buildDiagram(){
   body.appendChild(el('rect', {x:186, y:90, width:28, height:16, class:'body-fill'}));
   body.appendChild(el('path', {d:'M155,106 L245,106 L258,290 L142,290 Z', class:'body-fill'}));
   body.appendChild(el('path', {d:'M142,290 L258,290 L248,360 L152,360 Z', class:'body-fill'}));
-  body.appendChild(el('rect', {x:100, y:112, width:32, height:210, rx:14, class:'body-fill'}));
-  body.appendChild(el('rect', {x:268, y:112, width:32, height:210, rx:14, class:'body-fill'}));
+  body.appendChild(el('rect', {x:120, y:112, width:36, height:210, rx:14, class:'body-fill'}));
+  body.appendChild(el('rect', {x:244, y:112, width:36, height:210, rx:14, class:'body-fill'}));
   body.appendChild(el('rect', {x:155, y:360, width:40, height:300, rx:14, class:'body-fill'}));
   body.appendChild(el('rect', {x:205, y:360, width:40, height:300, rx:14, class:'body-fill'}));
   svg.appendChild(body);
