@@ -1257,7 +1257,7 @@ const MSK_DATA = [
     sources:['RaD-Pic — Radiography of Devices Pictionary (MSK Devices, Arthroplasty & Nails/Pins/Screws — Shoulder), Comer D. 2022']
   },
   {
-    id:'forearm_hand_msk', code:'FAH', name:'Forearm, Wrist & Hand', region:'MSK · Upper extremity (bilateral)', side:'left',
+    id:'forearm_hand_msk', code:'FAH', name:'Forearm, Wrist & Hand', chipLabel:'Forearm', region:'MSK · Upper extremity (bilateral)', side:'left',
     x:138, y:305,
     sections:[
                   {title:'Reference Images', source:'RaD-Pic Device Picture Dictionary', type:'gallery', gallery:'forearm_hand_msk'},
@@ -1362,7 +1362,7 @@ const MSK_DATA = [
     sources:['RaD-Pic — Radiography of Devices Pictionary (MSK Devices, Arthroplasty — Elbow), Comer D. 2022']
   },
   {
-    id:'tibfib_msk', code:'TIB', name:'Tibia & Fibula', region:'MSK · Lower extremity (bilateral)', side:'right',
+    id:'tibfib_msk', code:'TIB', name:'Tibia & Fibula', chipLabel:'Tibia/Fib', region:'MSK · Lower extremity (bilateral)', side:'right',
     x:225, y:598,
     sections:[
                   {title:'Reference Images', source:'RaD-Pic Device Picture Dictionary', type:'gallery', gallery:'tibfib_msk'},
@@ -2385,20 +2385,25 @@ function buildDiagram(){
     // label chip — sized dynamically to the actual text, so a long name
     // (e.g. "Carotid Artery", "Forearm, Wrist & Hand") never overflows the
     // pill. See measureTextWidth()/chipFontSize() below.
+    // chipLabel: optional shorter text for the topogram pill only (panel
+    // header, quick-jump chips, etc. still use the full o.name) — needed
+    // for limb markers where the marker itself sits close to the label
+    // column and a long name would physically overlap it.
+    const chipName = o.chipLabel || o.name;
     const chipH = 26;
     const leftPad = 10, codeGap = 8, endPad = 12;
-    const minChipW = 92, maxChipW = 210, minNameFont = 9;
+    const minChipW = 92, maxChipW = o.maxChipW || 210, minNameFont = 9;
     let nameFontSize = chipFontSize();
     const codeFont = `600 9px 'JetBrains Mono', monospace`;
     const codeW = measureTextWidth(o.code, codeFont);
     const codeAreaW = Math.max(34, leftPad + codeW + codeGap);
-    let nameW = measureTextWidth(o.name, `500 ${nameFontSize}px 'JetBrains Mono', monospace`);
+    let nameW = measureTextWidth(chipName, `500 ${nameFontSize}px 'JetBrains Mono', monospace`);
     let chipW = codeAreaW + nameW + endPad;
     if(chipW > maxChipW){
       // shrink the name font just enough to fit within maxChipW
       const avail = maxChipW - codeAreaW - endPad;
       nameFontSize = Math.max(minNameFont, nameFontSize * (avail / nameW));
-      nameW = measureTextWidth(o.name, `500 ${nameFontSize}px 'JetBrains Mono', monospace`);
+      nameW = measureTextWidth(chipName, `500 ${nameFontSize}px 'JetBrains Mono', monospace`);
       chipW = codeAreaW + nameW + endPad;
     }
     chipW = Math.max(minChipW, chipW);
@@ -2414,7 +2419,7 @@ function buildDiagram(){
       class:'label-chip-text', 'text-anchor': o._anchor==='start'?'start':'end', 'data-id':o.id,
       style: nameFontSize !== chipFontSize() ? `font-size:${nameFontSize.toFixed(2)}px` : ''
     });
-    nameText.textContent = o.name;
+    nameText.textContent = chipName;
     chipG.appendChild(bg); chipG.appendChild(nameText);
     chipG.addEventListener('click', ()=>selectOrgan(o.id));
     // code text separate (not clickable necessity, but fine)
