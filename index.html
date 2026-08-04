@@ -513,7 +513,7 @@ footer.appfoot{
     <div class="diagram-card">
       <div class="mode-tabs" id="modeTabs">
         <button class="mode-tab active" data-mode="viscera" onclick="switchMode('viscera')">Viscera · Chest / Abd / Pelvis</button>
-        <button class="mode-tab" data-mode="lines" onclick="switchMode('lines')">Lines/Tubes & Devices</button>
+        <button class="mode-tab" data-mode="msk" onclick="switchMode('msk')">MSK Hardware</button>
         <button class="mode-tab" data-mode="skills" onclick="switchMode('skills')">ACR Non-Interpretive Skills</button>
       </div>
       <div class="diagram-header">
@@ -539,7 +539,7 @@ footer.appfoot{
   </div>
 
   <footer class="appfoot">
-    <span>Built to be edited — see <code>ORGAN_DATA</code> (Viscera tab), <code>LINES_DATA</code> and <code>MSK_DATA</code> (both combined into the Lines/Tubes & Devices tab), or <code>SKILLS_DATA</code> (ACR Non-Interpretive Skills tab) in source to add regions/topics or update criteria as guidelines change.</span>
+    <span>Built to be edited — see <code>ORGAN_DATA</code> (Viscera tab), <code>MSK_DATA</code> (MSK Hardware tab), or <code>SKILLS_DATA</code> (ACR Non-Interpretive Skills tab) in source to add regions/topics or update criteria as guidelines change.</span>
     <span id="clock"></span>
   </footer>
 </div>
@@ -635,6 +635,8 @@ const ORGAN_DATA = [
           ['Margin','Smooth/ill-defined 0 · Lobulated/irreg 2 · Extrathyroidal 3'],
           ['Echogenic foci','None/comet-tail 0 · Macrocalc 1 · Peripheral calc 2 · Punctate 3'],
         ]},
+      {title:'How to Measure', source:'ACR TI-RADS, JACR 2017', type:'note',
+        text:'The size used against the FNA/follow-up thresholds below is the nodule\'s **single largest dimension, in any imaging plane** (transverse, sagittal, or coronal) — not an average of multiple axes.'},
       {title:'TI-RADS Levels & FNA Thresholds', source:'ACR TI-RADS, JACR 2017', type:'table',
         headers:['Level','Points','FNA if ≥','Follow if ≥'],
         rows:[
@@ -738,6 +740,9 @@ const ORGAN_DATA = [
     id:'lung', code:'LNG', name:'Lung', region:'Chest', side:'left',
     x:175, y:190,
     sections:[
+      {title:'How to Measure', source:'Fleischner Society, Radiology 2017', type:'note',
+        group:'Fleischner Society — Nodule Follow-up',
+        text:'Measure the **long-axis and short-axis diameters** on the single axial slice showing the nodule\'s greatest extent, using **lung windows** (not mediastinal/soft-tissue windows). Report the **average of the two** ((long + short)/2), rounded to the nearest mm. For part-solid nodules, measure the **total lesion diameter and the solid-component diameter separately** — !!it\'s the solid-component size, not the total size, that drives management above 6 mm!!.'},
       {title:'Fleischner — Solid Nodules (Incidental)', source:'Fleischner Society, Radiology 2017', type:'table',
         group:'Fleischner Society — Nodule Follow-up',
         headers:['Size','Low risk','High risk'],
@@ -784,13 +789,96 @@ const ORGAN_DATA = [
         'Interventricular septal bowing toward LV',
         'Consider clot burden (e.g. Qanadli score) for central vs. peripheral distribution',
       ]},
+      {title:'ETT / Tracheostomy Tube', source:'RaD-Pic Device Picture Dictionary', type:'table',
+        group:'Airway & GI Tubes',
+        headers:['Check','Criteria'],
+        rows:[
+          ['ETT tip position','~~5 cm above carina~~, neutral neck (±2 cm with flexion/extension); if carina obscured, just above the aortic knob or T2–T4 body level'],
+          ['Trach tip position','~~1/2 to 2/3~~ of the way from stoma to carina — not affected by neck position'],
+          ['!!Too high!!','Risk of inadvertent extubation, hypopharyngeal intubation (ineffective ventilation, gastric distension)'],
+          ['!!Too low!!','Bronchial (usually right-sided) intubation → contralateral atelectasis, ipsilateral overinflation/pneumothorax; RUL collapse if tip reaches bronchus intermedius'],
+          ['!!Esophageal intubation!!','ETT lateral to tracheal air column ± gastric distension — potentially fatal; RPO view can help confirm'],
+          ['!!Cuff overinflation!!','>1.5× normal tracheal diameter → tracheal rupture, tracheomalacia, stenosis'],
+        ]},
+      {title:'Thoracostomy (Chest) Tube', source:'RaD-Pic Device Picture Dictionary', type:'list',
+        group:'Airway & GI Tubes', items:[
+        '**Positioning:** tip apical for pneumothorax, basal for fluid; side hole medial to inner rib margin; enters over the superior rib margin (avoids neurovascular bundle)',
+        '**Always confirm both walls of the tube are visualized** — an unseen wall suggests extrapleural placement obscured by soft tissue',
+        '^^Intrafissural^^ placement → ineffective drainage ± lung herniation into the tube/infarction',
+        '!!Intraparenchymal!! placement → laceration, hematoma, infarction, bronchopleural fistula',
+        'Kinking/occlusion at the tip → ineffective drainage despite correct location',
+      ]},
+      {title:'NG / Nasoenteric Tube', source:'RaD-Pic Device Picture Dictionary', type:'list',
+        group:'Airway & GI Tubes', items:[
+        '**NG tube:** tip ~~beyond the gastric cardia~~; side port (if present) below the GE junction',
+        '**Nasoenteric feeding tube:** ideally distal to the pylorus, within the duodenum (antral position acceptable)',
+        '!!Malpositioning into the airway, pleural space, or through the diaphragm!! → laceration, contusion, pneumo/hydropneumothorax',
+        'Undetected tracheobronchial malposition + tube feeds → aspiration, pneumonia, lung abscess, empyema',
+      ]},
+      {title:'Central Venous Catheter (CVC / PICC)', source:'RaD-Pic Device Picture Dictionary', type:'table',
+        group:'Vascular & PA Catheters',
+        headers:['Check','Criteria'],
+        rows:[
+          ['Normal tip','~~SVC~~, below the anterior 1st rib, just above the cavoatrial junction (≈2 vertebral levels below the carina if the junction is hard to see)'],
+          ['!!Never!!','Tip within the right atrium (arrhythmia, myocardial rupture, tamponade); a right-sided line crossing midline'],
+          ['Atypical venous tips','Azygos, internal jugular reflux, and rarely internal mammary / superior intercostal / thymic / pericardiophrenic / inferior thyroid veins — consider anatomic variants (persistent left SVC, anomalous pulmonary vein)'],
+          ['Other complications','Pneumothorax (any placement attempt); venous thrombosis with prolonged dwell → risk of PE; pulsatile flow suggests inadvertent arterial catheterization'],
+        ]},
+      {title:'Pulmonary Artery (Swan-Ganz) Catheter', source:'RaD-Pic Device Picture Dictionary', type:'note',
+        group:'Vascular & PA Catheters',
+        text:'Tip should sit in the **right or left main PA**, ^^not beyond the proximal interlobar PA / within 2 cm of the hilum^^. Balloon inflated only during pressure readings. !!Overly distal tip, persistent balloon inflation, or clot around the tip!! → branch occlusion/infarction; vascular injury (rupture, dissection, pseudoaneurysm) can also occur.'},
+      {title:'IABP', source:'RaD-Pic Device Picture Dictionary', type:'note',
+        group:'Mechanical Circulatory Support',
+        text:'Visible radiopaque marker should sit **~~2 cm distal to the left subclavian artery origin~~**, just inferior to the aortic arch (alt. landmarks: 2 cm above the carina / the aorto-pulmonary window). !!Overadvancement!! → arch vessel occlusion (LUE or cerebral ischemia); !!underadvancement!! → mesenteric/renal artery occlusion (femoral approach assumed). Rare: aortic dissection, balloon rupture with gas embolization.'},
+      {title:'REBOA', source:'RaD-Pic Device Picture Dictionary', type:'note',
+        group:'Mechanical Circulatory Support',
+        text:'Femoral arterial access. Optimal placement is **Zone 1** (distal to L subclavian, proximal to celiac — massive abdominal/pelvic hemorrhage) or **Zone 3** (distal to renal arteries, proximal to aortic bifurcation — pelvic/junctional hemorrhage). !!Never Zone 2!! (between renal arteries and the segment above) — disrupts mesenteric/renal circulation. Balloon borders are marked by radiopaque bands.'},
+      {title:'ECMO Cannulas', source:'RaD-Pic Device Picture Dictionary', type:'table',
+        group:'Mechanical Circulatory Support',
+        headers:['Type','Positioning'],
+        rows:[
+          ['VV ECMO','Femoral cannula tip at !!IVC–RA junction!!; IJV cannula tip at !!SVC–RA junction!! (dual-lumen Avalon: inserted via right IJV into RA, tip in IVC) — respiratory support only'],
+          ['VA ECMO','Venous drainage + arterial return (aorta for central; femoral/axillary/subclavian artery for peripheral, most commonly femoral-femoral) — respiratory *and* hemodynamic support'],
+          ['Complications','Vessel obstruction (e.g. SVC), gas emboli, venous/arterial thrombosis, cerebral ischemia/stroke, hemorrhage from anticoagulation'],
+        ]},
+      {title:'LVAD (HeartMate II-type)', source:'RaD-Pic Device Picture Dictionary', type:'list',
+        group:'Mechanical Circulatory Support', items:[
+        '**Pump pocket depth:** ideal ~~12–14 cm~~; normally decreases 2–2.5 cm over time from cranial pump migration',
+        '**Inflow cannula angle:** ideally !!>55–65°!!, pointing to the central LV — should stay constant on serials',
+        '**Outflow cannula angle:** fixed and reproducible (generally >100°); deviation suggests acquisition error, not device change',
+        '^^MRI is contraindicated for all LVADs^^',
+        'Complications: neurologic events, driveline fraying/kinking (check on abdominal films), pneumothorax, pneumomediastinum, tamponade, infection (driveline, pocket, mediastinum, or internal pump — CT preferred)',
+      ]},
+      {title:'Esophageal Temperature Probe', source:'RaD-Pic Device Picture Dictionary', type:'note',
+        group:'Cardiac Implantable & Monitoring Devices',
+        text:'Normal tip position is **~~T8–T9~~**. Coiling in the proximal esophagus is the classic malposition to catch.'},
+      {title:'Pacemaker / ICD / CIED', source:'RaD-Pic Device Picture Dictionary', type:'table',
+        group:'Cardiac Implantable & Monitoring Devices',
+        headers:['Component','Normal course / position'],
+        rows:[
+          ['RA lead','Right atrial appendage; slight medial course on PA, anterior "J" curve on lateral'],
+          ['RV lead','Points toward the cardiac apex, left of the spine on PA; curves along the RA lateral wall → tricuspid valve → apex on lateral (alt.: RV outflow tract)'],
+          ['ICD shock coils','One at the brachiocephalic vein–SVC junction, one in the RV (dual-coil); newer subcutaneous ICD leads run left of the sternum'],
+          ['!!Watch for!!','Lead fracture (esp. at the generator or where the lead crosses the clavicle/1st rib), loop-free/linear lead course, pocket hematoma/infection/air-fluid level'],
+          ['Twiddler / Reel syndrome','Generator rotates along its lead axis (Twiddler) or sagittal axis (Reel) — usually from patient manipulation of the pocket'],
+        ]},
+      {title:'Other Support/Monitoring Devices', source:'RaD-Pic Device Picture Dictionary', type:'list',
+        group:'Cardiac Implantable & Monitoring Devices', items:[
+        '**Impella:** left-sided catheter placed retrograde across the aortic valve via the femoral artery — pigtail inflow should sit centrally over the LV; Impella RP inflow in the IVC, outflow in the main PA',
+        '**Insertable cardiac monitor / loop recorder:** subcutaneous, overlying the left pectoralis',
+        '**CardioMEMS:** deployed within a distal pulmonary artery for PA pressure monitoring',
+        '**Vagal nerve stimulator (VNS):** electrode + generator for refractory epilepsy — ^^don\'t confuse with a pacemaker/ICD^^',
+      ]},
     ],
-    sources:['MacMahon H et al. Fleischner Society, Radiology 2017','ACR Lung-RADS v2022','AJCC Cancer Staging Manual, 8th ed. — Lung']
+    sources:['MacMahon H et al. Fleischner Society, Radiology 2017','ACR Lung-RADS v2022','RaD-Pic — Radiography of Devices Pictionary (Chest Devices), Comer D. 2022','AJCC Cancer Staging Manual, 8th ed. — Lung']
   },
   {
     id:'liver', code:'LIV', name:'Liver', region:'Abdomen · RUQ', side:'left',
     x:175, y:250,
     sections:[
+      {title:'How to Measure', source:'ACR LI-RADS v2018 Manual', type:'note',
+        group:'LI-RADS v2018',
+        text:'Measure the observation on **whichever phase, sequence, or plane that shows the clearest margin** — measurement on the arterial phase and DWI sequence should be avoided as size could be overestimated.^^Use the same phase on follow-up exams^^ for consistent growth assessment (threshold growth = ≥50% diameter increase in ≤6 mo, measured on the same phase both times).'},
       {title:'LR-3/4/5 Diagnostic Table', source:'visual summary', type:'visual',
         group:'LI-RADS v2018',
         builder:'lirads-grid',
@@ -843,6 +931,9 @@ const ORGAN_DATA = [
     id:'kidney', code:'KID', name:'Kidney', region:'Abdomen · Flank (bilateral)', side:'left',
     x:160, y:295,
     sections:[
+      {title:'How to Measure', source:'Bosniak 2019 update, Radiology', type:'note',
+        group:'Bosniak Classification (2019)',
+        text:'Measure the lesion\'s **single largest diameter** on the sequence/phase that best depicts its outer margin — on CT this is typically the **nephrographic (portal venous) phase**; on MRI, T2WI or the most conspicuous post-contrast phase. Measure septa/wall thickness on the phase where they enhance most conspicuously, since this is what separates Bosniak II from IIF/III.'},
       {title:'Bosniak Classes at a Glance', source:'visual summary', type:'visual',
         group:'Bosniak Classification (2019)',
         builder:'bosniak',
@@ -1006,6 +1097,8 @@ const ORGAN_DATA = [
         group:'BI-RADS Descriptor Pictorials',
         builder:'birads-calc-dist',
         caption:'Distribution matters as much as shape: **~~diffuse/scattered~~** favors benign. Regional is nonspecific. Grouped/clustered raises concern. **!!Linear!!** and especially **!!segmental!!** distributions (mapping to a duct or lobe) are the most suspicious, especially with suspicious morphology.'},
+      {title:'How to Measure', source:'ACR BI-RADS Atlas, 5th ed.', type:'note',
+        text:'Report the lesion\'s **greatest single dimension**, and specify the modality it was measured on — mammographic, sonographic, and MRI size **routinely differ** (US tends to track invasive-component size best; MRI is generally most accurate for full disease extent, especially DCIS, which mammography can underestimate). ^^Flag a discordance of roughly ≥20% between modalities^^ rather than silently picking one number, since it changes surgical planning.'},
       {title:'BI-RADS Categories & Management', source:'ACR BI-RADS Atlas, 5th ed.', type:'table',
         headers:['Category','Meaning','Management'],
         rows:[
@@ -1054,6 +1147,8 @@ const ORGAN_DATA = [
     id:'adrenal', code:'ADR', name:'Adrenal', region:'Abdomen · Suprarenal (bilateral)', side:'right',
     x:200, y:285,
     sections:[
+      {title:'How to Measure', source:'ACR Incidental Findings, adrenal', type:'note',
+        text:'Measure the **largest diameter** on the same series used for HU/washout calculation — usually the non-contrast or portal venous phase axial image. Use the **same phase and plane on follow-up** for a valid growth comparison; a nodule "growing" only because it was measured on a different phase is a common pitfall.'},
       {title:'Incidentaloma Characterization', source:'ACR Incidental Findings, adrenal', type:'table',
         headers:['Test','Threshold','Interpretation'],
         rows:[
@@ -1072,6 +1167,8 @@ const ORGAN_DATA = [
     id:'pancreas', code:'PAN', name:'Pancreas', region:'Abdomen · Mid-epigastric', side:'right',
     x:200, y:265,
     sections:[
+      {title:'How to Measure', source:'International Consensus (Tanaka et al. 2017)', type:'note',
+        text:'Measure the cyst\'s **largest diameter on MRCP/heavily T2-weighted images**, which best show fluid-filled side-branch anatomy (CT tends to underestimate cyst extent and duct communication). Measure the **main pancreatic duct diameter separately** at its widest point — it is an independent worrisome/high-risk criterion, not just a cyst-size modifier.'},
       {title:'IPMN — Fukuoka / High-Risk Stigmata', source:'International Consensus (Tanaka et al. 2017)', type:'list', items:[
         '!!High-risk stigmata (→ surgical evaluation):!! obstructive jaundice with cyst in the head; enhancing mural nodule !!≥5 mm!!; main pancreatic duct !!≥10 mm!!',
         '^^Worrisome features (→ EUS):^^ cyst ≥3 cm; thickened/enhancing cyst walls; main duct 5–9 mm; abrupt duct caliber change with distal atrophy; lymphadenopathy; elevated CA19-9; growth rate ≥5 mm over 2 yrs',
@@ -1087,6 +1184,8 @@ const ORGAN_DATA = [
       {title:'Morphologic Spectrum', source:'visual summary', type:'visual',
         builder:'orads-spectrum',
         caption:'Risk tracks architecture: a **~~simple unilocular cyst~~** (O-RADS 2) sits at the benign end; solid components and **!!vascular solid tissue!!** (O-RADS 5) sit at the high-risk end.'},
+      {title:'How to Measure', source:'ACR O-RADS US v2022', type:'note',
+        text:'Report the lesion\'s **three orthogonal diameters**. For a complex mass, measure the **solid component separately from the cystic component** — the largest solid-component diameter (and its color/vascularity score) is what actually drives the O-RADS category, not overall lesion size.'},
       {title:'O-RADS US Risk Categories', source:'ACR O-RADS US v2022', type:'table',
         headers:['Category','Risk of malignancy','Example features'],
         rows:[
@@ -1133,6 +1232,8 @@ const ORGAN_DATA = [
         '**Transition zone (TZ):** T2WI is dominant',
         'DCE can upgrade a **PZ score of 3 → 4** if focal, early, and corresponds to the DWI finding',
       ]},
+      {title:'How to Measure', source:'PI-RADS v2.1', type:'note',
+        text:'Measure the index lesion\'s **greatest diameter on whichever sequence is dominant for its zone** (above) — DWI/high-b-value or ADC for a peripheral zone lesion, T2WI for a transition zone lesion. This matters directly for management: peripheral-zone tumor-capsule contact length !!>1.5 cm!! is a key surrogate for extraprostatic extension (see below).'},
       {title:'Prostate Cancer — Findings That Change Management', source:'AJCC/EAU-ESUR staging; extraprostatic extension literature', type:'stageshift',
         items:[
           {finding:'Capsular bulge/irregularity, tumor-capsule contact length !!>1.5 cm!!, or frank neurovascular bundle asymmetry — signs of extraprostatic extension (EPE)',
