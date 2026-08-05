@@ -554,6 +554,13 @@ footer.appfoot{
   font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);
   margin-top:12px;line-height:1.5;
 }
+.feedback-status{
+  font-family:var(--font-mono);font-size:11.5px;line-height:1.5;margin:0;min-height:0;
+}
+.feedback-status.success{color:var(--accent-green);margin-bottom:10px;}
+.feedback-status.error{color:var(--accent-red);margin-bottom:10px;}
+.feedback-status.sending{color:var(--text-tertiary);margin-bottom:10px;}
+.feedback-send:disabled,.feedback-cancel:disabled{opacity:0.5;cursor:not-allowed;}
 @media(max-width:640px){
   .feedback-fab{right:14px;bottom:14px;padding:10px 14px;}
   .feedback-fab .fab-label{display:none;}
@@ -660,12 +667,14 @@ footer.appfoot{
       <input type="email" id="fbEmail" placeholder="you@example.com">
     </div>
 
+    <p class="feedback-status" id="fbStatus"></p>
+
     <div class="feedback-actions">
-      <button class="feedback-cancel" onclick="closeFeedback()">Cancel</button>
-      <button class="feedback-send" onclick="sendFeedback()">Send feedback</button>
+      <button class="feedback-cancel" id="fbCancelBtn" onclick="closeFeedback()">Cancel</button>
+      <button class="feedback-send" id="fbSendBtn" onclick="sendFeedback()">Send feedback</button>
     </div>
 
-    <p class="feedback-note">This opens your default email app with a pre-filled message addressed to dr.irenelee.md@gmail.com — review it and hit send there.</p>
+    <p class="feedback-note">Sent directly to dr.irenelee.md@gmail.com — you won't leave this page.</p>
   </div>
 </div>
 
@@ -2533,37 +2542,68 @@ function openLightbox(galleryKey, i){
   document.getElementById('lightboxCap').textContent = it.caption;
   overlay.classList.add('open');
 }
+const FEEDBACK_ENDPOINT = 'https://formspree.io/f/xwleedql';
+
 function openFeedback(){
   document.getElementById('feedbackModal').classList.add('open');
+  setFeedbackStatus('', '');
 }
 function closeFeedback(){
   document.getElementById('feedbackModal').classList.remove('open');
 }
-function sendFeedback(){
+function setFeedbackStatus(text, kind){
+  const el = document.getElementById('fbStatus');
+  el.textContent = text;
+  el.className = 'feedback-status' + (kind ? ' ' + kind : '');
+}
+function setFeedbackBusy(busy){
+  document.getElementById('fbSendBtn').disabled = busy;
+  document.getElementById('fbCancelBtn').disabled = busy;
+}
+
+async function sendFeedback(){
   const type = document.getElementById('fbType').value;
-  const message = document.getElementById('fbMessage').value.trim();
+  const messageEl = document.getElementById('fbMessage');
+  const message = messageEl.value.trim();
   const fromEmail = document.getElementById('fbEmail').value.trim();
 
   if(!message){
-    document.getElementById('fbMessage').focus();
+    messageEl.focus();
+    setFeedbackStatus('Please add a message before sending.', 'error');
     return;
   }
 
-  const subject = `On-Call Radiology Reference — Feedback (${type})`;
-  const bodyLines = [
-    `Type: ${type}`,
-    '',
-    message,
-    '',
-    '---',
-    `Page: ${window.location.href}`,
-    fromEmail ? `Reply-to: ${fromEmail}` : null
-  ].filter(Boolean);
-  const body = bodyLines.join('\n');
+  setFeedbackBusy(true);
+  setFeedbackStatus('Sending…', 'sending');
 
-  const mailto = `mailto:dr.irenelee.md@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailto;
-  closeFeedback();
+  try{
+    const res = await fetch(FEEDBACK_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: (() => {
+        const fd = new FormData();
+        fd.append('type', type);
+        fd.append('message', message);
+        if(fromEmail) fd.append('_replyto', fromEmail);
+        fd.append('_subject', `On-Call Radiology Reference — Feedback (${type})`);
+        fd.append('page', window.location.href);
+        return fd;
+      })()
+    });
+
+    if(res.ok){
+      setFeedbackStatus('Thanks — your feedback was sent.', 'success');
+      messageEl.value = '';
+      document.getElementById('fbEmail').value = '';
+      setTimeout(closeFeedback, 1600);
+    } else {
+      setFeedbackStatus('Something went wrong sending that. Please try again.', 'error');
+    }
+  } catch(err){
+    setFeedbackStatus('Network error — please check your connection and try again.', 'error');
+  } finally {
+    setFeedbackBusy(false);
+  }
 }
 
 function closeLightbox(){
