@@ -482,6 +482,83 @@ footer.appfoot{
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
 }
 
+/* ---- feedback button + modal ---- */
+.feedback-fab{
+  position:fixed;right:22px;bottom:22px;z-index:90;
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-panel-raised);border:1px solid var(--border-strong);
+  color:var(--text-primary);font-family:var(--font-mono);font-size:11.5px;
+  letter-spacing:0.03em;padding:11px 16px;border-radius:999px;cursor:pointer;
+  box-shadow:0 4px 18px rgba(0,0,0,0.35);transition:all .15s ease;
+}
+.feedback-fab:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+.feedback-fab svg{width:14px;height:14px;flex-shrink:0;}
+
+.feedback-modal{
+  position:fixed;inset:0;background:rgba(4,6,9,0.92);
+  display:none;align-items:center;justify-content:center;z-index:110;
+  padding:24px;backdrop-filter:blur(3px);
+}
+.feedback-modal.open{display:flex;}
+.feedback-inner{
+  width:100%;max-width:440px;max-height:90vh;overflow-y:auto;
+  background:var(--bg-panel);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-l);padding:22px;position:relative;
+}
+.feedback-close{
+  position:absolute;top:16px;right:16px;background:var(--bg-panel-raised);
+  border:1px solid var(--border-strong);color:var(--text-primary);
+  width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+}
+.feedback-close:hover{border-color:var(--accent-red);color:var(--accent-red);}
+.feedback-inner h3{
+  font-family:var(--font-display);font-size:16px;font-weight:600;margin:0 0 6px;
+  padding-right:30px;
+}
+.feedback-inner .fsub{
+  font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);
+  margin:0 0 18px;line-height:1.5;
+}
+.feedback-field{margin-bottom:14px;}
+.feedback-field label{
+  display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--text-secondary);
+  letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;
+}
+.feedback-field select,
+.feedback-field input,
+.feedback-field textarea{
+  width:100%;background:var(--bg-chip);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-s);color:var(--text-primary);
+  font-family:var(--font-body);font-size:13px;padding:9px 11px;
+  box-sizing:border-box;
+}
+.feedback-field select:focus,
+.feedback-field input:focus,
+.feedback-field textarea:focus{outline:none;border-color:var(--accent-cyan);}
+.feedback-field textarea{resize:vertical;min-height:100px;font-family:var(--font-body);}
+.feedback-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:6px;}
+.feedback-cancel{
+  background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);
+  font-family:var(--font-mono);font-size:11.5px;padding:9px 14px;border-radius:var(--radius-s);
+  cursor:pointer;
+}
+.feedback-cancel:hover{border-color:var(--border-strong);color:var(--text-primary);}
+.feedback-send{
+  background:var(--accent-cyan-dim);border:1px solid var(--accent-cyan);color:var(--accent-cyan);
+  font-family:var(--font-mono);font-size:11.5px;font-weight:600;padding:9px 16px;
+  border-radius:var(--radius-s);cursor:pointer;
+}
+.feedback-send:hover{background:var(--accent-cyan);color:var(--bg-void);}
+.feedback-note{
+  font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);
+  margin-top:12px;line-height:1.5;
+}
+@media(max-width:640px){
+  .feedback-fab{right:14px;bottom:14px;padding:10px 14px;}
+  .feedback-fab .fab-label{display:none;}
+}
+
 @media(max-width:980px){
   .panel{position:static;max-height:none;}
 }
@@ -549,6 +626,46 @@ footer.appfoot{
     <button class="lightbox-close" onclick="closeLightbox()">✕</button>
     <img id="lightboxImg" src="" alt="">
     <div class="lightbox-cap" id="lightboxCap"></div>
+  </div>
+</div>
+
+<button class="feedback-fab" id="feedbackFab" onclick="openFeedback()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+  <span class="fab-label">Feedback</span>
+</button>
+
+<div class="feedback-modal" id="feedbackModal" onclick="if(event.target===this) closeFeedback()">
+  <div class="feedback-inner">
+    <button class="feedback-close" onclick="closeFeedback()">✕</button>
+    <h3>Report an error or suggestion</h3>
+    <p class="fsub">Found a wrong threshold, a broken link, or have an idea to improve this reference? Let us know below.</p>
+
+    <div class="feedback-field">
+      <label for="fbType">Type</label>
+      <select id="fbType">
+        <option value="Error / incorrect content">Error / incorrect content</option>
+        <option value="Suggestion / improvement">Suggestion / improvement</option>
+        <option value="Bug / display issue">Bug / display issue</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="feedback-field">
+      <label for="fbMessage">Message</label>
+      <textarea id="fbMessage" placeholder="Describe the error or suggestion, and where in the reference it appears (e.g. tab, region, section)..."></textarea>
+    </div>
+
+    <div class="feedback-field">
+      <label for="fbEmail">Your email (optional)</label>
+      <input type="email" id="fbEmail" placeholder="you@example.com">
+    </div>
+
+    <div class="feedback-actions">
+      <button class="feedback-cancel" onclick="closeFeedback()">Cancel</button>
+      <button class="feedback-send" onclick="sendFeedback()">Send feedback</button>
+    </div>
+
+    <p class="feedback-note">This opens your default email app with a pre-filled message addressed to dr.irenelee.md@gmail.com — review it and hit send there.</p>
   </div>
 </div>
 
@@ -2416,6 +2533,39 @@ function openLightbox(galleryKey, i){
   document.getElementById('lightboxCap').textContent = it.caption;
   overlay.classList.add('open');
 }
+function openFeedback(){
+  document.getElementById('feedbackModal').classList.add('open');
+}
+function closeFeedback(){
+  document.getElementById('feedbackModal').classList.remove('open');
+}
+function sendFeedback(){
+  const type = document.getElementById('fbType').value;
+  const message = document.getElementById('fbMessage').value.trim();
+  const fromEmail = document.getElementById('fbEmail').value.trim();
+
+  if(!message){
+    document.getElementById('fbMessage').focus();
+    return;
+  }
+
+  const subject = `On-Call Radiology Reference — Feedback (${type})`;
+  const bodyLines = [
+    `Type: ${type}`,
+    '',
+    message,
+    '',
+    '---',
+    `Page: ${window.location.href}`,
+    fromEmail ? `Reply-to: ${fromEmail}` : null
+  ].filter(Boolean);
+  const body = bodyLines.join('\n');
+
+  const mailto = `mailto:dr.irenelee.md@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+  closeFeedback();
+}
+
 function closeLightbox(){
   document.getElementById('lightbox').classList.remove('open');
 }
